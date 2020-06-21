@@ -1,28 +1,70 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Header />
+    <SearchBox v-on:do-search="doSearch"/>
+    <Sibling v-bind:req="tower.res" 
+      v-on:clear-req-header="clearReqHeader"
+      v-on:clear-req-body="clearReqBody" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from './components/layout/Header';
+import SearchBox from './components/SearchBox';
+import Sibling from './components/Sibling';
+import axios from 'axios';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Header,
+    SearchBox,
+    Sibling
+  },
+  data() {
+    return {
+      tower: {
+          res: {
+            header: "empty",
+            body: "empty"
+          }
+        }
+    }
+  },
+  methods: {
+    doSearch(searchQuery) {
+      // do search
+      console.log(searchQuery.q);
+
+      axios.get("http://jsonplaceholder.typicode.com/users?_limit=3")
+        .then(res => {
+          console.log(res); 
+          this.tower.res.header = res.headers;
+          this.tower.res.body = res.data;
+        })
+        .catch(err => console.log(err));
+    },
+
+    clearReqHeader() {
+      this.tower.res.header = 'cleared';
+    },
+
+    clearReqBody() {
+      this.tower.res.body = 'cleared';
+    }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  * { 
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.4;
+  }
 </style>
